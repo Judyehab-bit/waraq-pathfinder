@@ -76,10 +76,14 @@ function write<T>(key: string, value: T) {
 }
 
 function useStored<T>(key: string, fallback: T) {
+  const fallbackRef = useRef(fallback);
   const [value, setValue] = useState<T>(fallback);
   const [hydrated, setHydrated] = useState(false);
 
-  const sync = useCallback(() => setValue(read<T>(key, fallback)), [key, fallback]);
+  const sync = useCallback(() => {
+    const next = read<T>(key, fallbackRef.current);
+    setValue((prev) => (JSON.stringify(prev) === JSON.stringify(next) ? prev : next));
+  }, [key]);
 
   useEffect(() => {
     sync();
@@ -89,6 +93,7 @@ function useStored<T>(key: string, fallback: T) {
       listeners.delete(sync);
     };
   }, [sync]);
+
 
   const set = useCallback(
     (next: T) => {
