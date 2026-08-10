@@ -315,7 +315,7 @@ export const SERVICES: Service[] = [
         id: "dataChanged",
         text: "هل بياناتك الشخصية اتغيرت (الاسم أو العنوان)؟",
         options: yesNo,
-        showIf: (a) => a["type"] !== "first",
+        showIf: (a) => Boolean(a["type"]) && a["type"] !== "first",
       },
       {
         id: "male",
@@ -377,7 +377,7 @@ export const SERVICES: Service[] = [
         id: "moved",
         text: "هل غيّرت محل سكنك؟",
         options: yesNo,
-        showIf: (a) => a["type"] !== "first",
+        showIf: (a) => Boolean(a["type"]) && a["type"] !== "first",
       },
     ],
     requiredDocuments: [
