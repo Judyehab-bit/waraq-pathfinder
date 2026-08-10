@@ -15,6 +15,7 @@ import { Route as HelpRouteImport } from './routes/help'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ProceduresRouteImport } from './routes/procedures'
 import { Route as ServicesRouteImport } from './routes/services'
+import { Route as ServiceServiceIdRouteImport } from './routes/service.$serviceId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const ServicesRoute = ServicesRouteImport.update({
   path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ServiceServiceIdRoute = ServiceServiceIdRouteImport.update({
+  id: '/service/$serviceId',
+  path: '/service/$serviceId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/procedures': typeof ProceduresRoute
   '/services': typeof ServicesRoute
+  '/service/$serviceId': typeof ServiceServiceIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/procedures': typeof ProceduresRoute
   '/services': typeof ServicesRoute
+  '/service/$serviceId': typeof ServiceServiceIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,13 +79,27 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/procedures': typeof ProceduresRoute
   '/services': typeof ServicesRoute
+  '/service/$serviceId': typeof ServiceServiceIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/documents' | '/help' | '/onboarding' | '/procedures' | '/services'
+    | '/'
+    | '/documents'
+    | '/help'
+    | '/onboarding'
+    | '/procedures'
+    | '/services'
+    | '/service/$serviceId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/documents' | '/help' | '/onboarding' | '/procedures' | '/services'
+  to:
+    | '/'
+    | '/documents'
+    | '/help'
+    | '/onboarding'
+    | '/procedures'
+    | '/services'
+    | '/service/$serviceId'
   id:
     | '__root__'
     | '/'
@@ -86,6 +108,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/procedures'
     | '/services'
+    | '/service/$serviceId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,6 +118,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   ProceduresRoute: typeof ProceduresRoute
   ServicesRoute: typeof ServicesRoute
+  ServiceServiceIdRoute: typeof ServiceServiceIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -141,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/service/$serviceId': {
+      id: '/service/$serviceId'
+      path: '/service/$serviceId'
+      fullPath: '/service/$serviceId'
+      preLoaderRoute: typeof ServiceServiceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -151,7 +182,18 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   ProceduresRoute: ProceduresRoute,
   ServicesRoute: ServicesRoute,
+  ServiceServiceIdRoute: ServiceServiceIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

@@ -94,11 +94,13 @@ function ServicePage() {
   );
 
   function saveAnswers() {
+    if (!service) return;
     upsert(service.id, { answers, answered: true, done: suggestedIds(), });
     toast.success("تمام! جهزنا لك الخطوات المناسبة لحالتك.");
   }
 
   function suggestedIds() {
+    if (!service) return [];
     const fromWallet = requiredDocsFor(service, answers)
       .filter((d) => walletDocs.some((w) => w.name.includes(d.name.split(" ")[0] ?? "___")))
       .map((d) => d.id);
@@ -106,6 +108,7 @@ function ServicePage() {
   }
 
   function toggle(docId: string) {
+    if (!service) return;
     const next = done.includes(docId) ? done.filter((d) => d !== docId) : [...done, docId];
     upsert(service.id, { done: next, answers: proc?.answers ?? answers, answered: true });
     if (!done.includes(docId)) toast.success("تمام ✔ اتحدثت الخطوات");
