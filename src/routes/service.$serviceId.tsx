@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   Check,
@@ -80,18 +80,13 @@ function ServicePage() {
   const questions = visibleQuestions(service, answers);
   const allAnswered = questions.every((q) => answers[q.id]);
   const requiredDocs = requiredDocsFor(service, proc?.answers ?? answers);
+  const suggested = requiredDocs.filter((d) =>
+    walletDocs.some((w) => w.name.includes(d.name.split(" ")[0] ?? "___")),
+  );
   const steps = stepsFor(service, proc?.answers ?? answers);
   const done = proc?.done ?? [];
   const pct = requiredDocs.length ? Math.round((done.length / requiredDocs.length) * 100) : 0;
   const complete = requiredDocs.length > 0 && done.length === requiredDocs.length;
-
-  const suggested = useMemo(
-    () =>
-      requiredDocs.filter((d) =>
-        walletDocs.some((w) => w.name.includes(d.name.split(" ")[0] ?? "___")),
-      ),
-    [requiredDocs, walletDocs],
-  );
 
   function saveAnswers() {
     if (!service) return;
