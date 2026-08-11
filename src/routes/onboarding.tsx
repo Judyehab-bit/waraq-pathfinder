@@ -92,7 +92,7 @@ function Onboarding() {
     e.target.value = "";
   }
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     const next: Record<string, string> = {};
     if (!name.trim()) next["name"] = "اكتب اسمك عشان نكلمك باسمك.";
@@ -101,7 +101,14 @@ function Onboarding() {
     setErrors(next);
     if (Object.keys(next).length) return;
 
-    setProfile({ name: name.trim(), age, city, area: area.trim(), geo });
+    const data = { name: name.trim(), age, city, area: area.trim(), geo };
+    setProfile(data);
+    try {
+      await saveProfileToCloud(data);
+    } catch {
+      toast.error("مقدرناش نحفظ بياناتك دلوقتي. بياناتك محفوظة على جهازك، جرّب تاني بعد شوية.");
+      return;
+    }
     toast.success("أهلاً بيك في WARAQ 👋");
     navigate({ to: "/services" });
   }
