@@ -24,7 +24,11 @@ export const Route = createFileRoute("/")({
 });
 
 const POINTS = [
-  { Icon: ListChecks, title: "تعرف إيه المطلوب", text: "قائمة مستندات مخصّصة لحالتك أنت، مش قائمة عامة." },
+  {
+    Icon: ListChecks,
+    title: "تعرف إيه المطلوب",
+    text: "قائمة مستندات مخصّصة لحالتك أنت، مش قائمة عامة.",
+  },
   { Icon: MapPin, title: "تعرف تجيبه منين", text: "أماكن قريبة، مواعيد عمل، وتكلفة ووقت تقديري." },
   { Icon: ShieldCheck, title: "تخلص بثقة", text: "لما تجهز كل حاجة، نوجّهك للمنصة الرسمية." },
 ];
@@ -51,11 +55,15 @@ function Welcome() {
           />
 
           <p className="mt-8 max-w-2xl text-sm leading-relaxed text-foreground sm:text-base">
-            WARAQ يساعدك تفهم وتجهّز إجراءاتك الرسمية من غير لخبطة الأوراق الناقصة، ولا المتطلبات غير
-            الواضحة، ولا المشاوير الزيادة.
+            WARAQ يساعدك تفهم وتجهّز إجراءاتك الرسمية من غير لخبطة الأوراق الناقصة، ولا المتطلبات
+            غير الواضحة، ولا المشاوير الزيادة.
           </p>
 
-          <Button asChild size="lg" className="mt-8 min-h-14 w-full max-w-xs rounded-2xl text-base font-bold">
+          <Button
+            asChild
+            size="lg"
+            className="mt-8 min-h-14 w-full max-w-xs rounded-2xl text-base font-bold"
+          >
             <Link to="/onboarding">
               ابدأ دلوقتي
               <ArrowLeft className="size-5" aria-hidden="true" />
