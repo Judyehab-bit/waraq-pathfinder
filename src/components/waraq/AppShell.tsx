@@ -1,9 +1,18 @@
-import { Link } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
-import { Home, ClipboardList, FileText, HelpCircle, Settings2 } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState, type ReactNode } from "react";
+import {
+  Home,
+  ClipboardList,
+  FileText,
+  HelpCircle,
+  Settings2,
+  LogOut,
+  User,
+  MapPin,
+} from "lucide-react";
 import logo from "@/assets/waraq-full-logo.png.asset.json";
 import mark from "@/assets/waraq-mark.png.asset.json";
-import { useSettings } from "@/lib/waraq/store";
+import { useSettings, useProfile, useAuthUser } from "@/lib/waraq/store";
 import { useT } from "@/lib/waraq/i18n";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +24,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { GOVERNORATES } from "@/lib/waraq/services";
+import { signOutCurrentSession } from "@/lib/waraq/profile-sync";
+import { toast } from "sonner";
 import Chatbot from "./Chatbot";
 
 const NAV = [
@@ -49,9 +69,44 @@ export function WaraqMark({ className = "h-9" }: { className?: string }) {
   );
 }
 
-function AccessibilityMenu() {
+function SettingsAndProfileMenu() {
+  const navigate = useNavigate();
+  const { user } = useAuthUser();
+  const { profile, setProfile } = useProfile();
   const { settings, setSettings } = useSettings();
   const { t } = useT();
+
+  const [name, setName] = useState(profile?.name || "");
+  const [city, setCity] = useState(profile?.city || "القاهرة");
+  const [area, setArea] = useState(profile?.area || "");
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (profile) {
+      setName(profile.name);
+      setCity(profile.city || "القاهرة");
+      setArea(profile.area || "");
+    }
+  }, [profile]);
+
+  async function handleSaveProfile(e: React.FormEvent) {
+    e.preventDefault();
+    if (!profile) return;
+    await setProfile({
+      ...profile,
+      name,
+      city,
+      area,
+    });
+    toast.success("تم تحديث بيانات ملفك الشحصي والمحافظة بنجاح");
+  }
+
+  async function handleLogout() {
+    await signOutCurrentSession();
+    toast.success("تم تسجيل الخروج");
+    setOpen(false);
+    navigate({ to: "/onboarding" });
+  }
 
   const sizes: { value: "normal" | "large" | "xl"; label: string }[] = [
     { value: "normal", label: t("normal") },
@@ -60,18 +115,82 @@ function AccessibilityMenu() {
   ];
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" aria-label={t("settings")}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="min-h-11 min-w-11 rounded-xl"
+          aria-label={t("settings")}
+        >
           <Settings2 className="size-5" aria-hidden="true" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-h-[90vh] max-w-md overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t("settings")}</DialogTitle>
-          <DialogDescription>اظبط الخط والتباين واللغة على راحتك.</DialogDescription>
+          <DialogTitle>الإعدادات والملف الشخصي</DialogTitle>
+          <DialogDescription>تعديل بيانات المحافظة وإعدادات العرض</DialogDescription>
         </DialogHeader>
+
         <div className="space-y-6">
+          {user && profile && (
+            <form
+              onSubmit={handleSaveProfile}
+              className="space-y-4 rounded-2xl bg-secondary/50 p-4"
+            >
+              <div className="flex items-center gap-2 font-bold text-foreground">
+                <User className="size-4 text-accent" />
+                حسابي الشخصي ({profile.username || "مستخدم"})
+              </div>
+
+              <div>
+                <Label htmlFor="prof-name">الاسم</Label>
+                <Input
+                  id="prof-name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mt-1.5 min-h-11 rounded-xl"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="prof-city" className="flex items-center gap-1">
+                  <MapPin className="size-3.5 text-accent" />
+                  المحافظة (لتصفية الأماكن القريبة)
+                </Label>
+                <Select value={city} onValueChange={setCity}>
+                  <SelectTrigger id="prof-city" className="mt-1.5 min-h-11 rounded-xl">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {GOVERNORATES.map((g) => (
+                      <SelectItem key={g} value={g}>
+                        {g}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="prof-area">المنطقة أو الحي</Label>
+                <Input
+                  id="prof-area"
+                  value={area}
+                  onChange={(e) => setArea(e.target.value)}
+                  placeholder="مثال: المعادي"
+                  className="mt-1.5 min-h-11 rounded-xl"
+                />
+              </div>
+
+              <Button type="submit" size="sm" className="w-full rounded-xl font-bold">
+                حفظ تعديلات الملف والمحافظة
+              </Button>
+            </form>
+          )}
+
+          <hr className="border-border" />
+
           <div>
             <Label className="mb-2 block">{t("textSize")}</Label>
             <div className="flex flex-wrap gap-2">
@@ -87,6 +206,7 @@ function AccessibilityMenu() {
               ))}
             </div>
           </div>
+
           <div className="flex items-center justify-between gap-4">
             <Label htmlFor="hc-switch">{t("contrast")}</Label>
             <Switch
@@ -95,6 +215,7 @@ function AccessibilityMenu() {
               onCheckedChange={(v) => setSettings({ ...settings, contrast: v })}
             />
           </div>
+
           <div>
             <Label className="mb-2 block">{t("language")}</Label>
             <div className="flex gap-2">
@@ -114,6 +235,19 @@ function AccessibilityMenu() {
               </Button>
             </div>
           </div>
+
+          {user && (
+            <div className="pt-2">
+              <Button
+                variant="destructive"
+                onClick={handleLogout}
+                className="min-h-12 w-full rounded-xl font-bold"
+              >
+                <LogOut className="ml-2 size-4" />
+                تسجيل الخروج
+              </Button>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
@@ -164,7 +298,7 @@ export default function AppShell({
                 </Link>
               ))}
             </nav>
-            <AccessibilityMenu />
+            <SettingsAndProfileMenu />
           </div>
         </div>
       </header>
