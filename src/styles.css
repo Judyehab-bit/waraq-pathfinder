@@ -5,7 +5,6 @@
 @custom-variant dark (&:is(.dark *));
 @custom-variant hc (&:is(.hc *));
 
-
 /*
  * Design system definition.
  *
@@ -197,4 +196,3 @@ html[data-text="xl"] {
   border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-soft);
 }
-
