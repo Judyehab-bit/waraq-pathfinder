@@ -7,14 +7,23 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useDocs, type StoredDoc } from "@/lib/waraq/store";
 
 export const Route = createFileRoute("/documents")({
   head: () => ({
     meta: [
       { title: "أوراقي — WARAQ" },
-      { name: "description", content: "محفظة أوراقك: نوع المستند، تاريخ الإضافة، وتاريخ الانتهاء والتنبيهات." },
+      {
+        name: "description",
+        content: "محفظة أوراقك: نوع المستند، تاريخ الإضافة، وتاريخ الانتهاء والتنبيهات.",
+      },
       { property: "og:title", content: "أوراقي في WARAQ" },
       { property: "og:description", content: "شوف الأوراق اللي معاك واللي قربت تنتهي." },
     ],
@@ -22,13 +31,24 @@ export const Route = createFileRoute("/documents")({
   component: Documents,
 });
 
-const TYPES = ["بطاقة الرقم القومي", "شهادة الميلاد المميكنة", "جواز سفر", "رخصة قيادة", "صور شخصية", "أخرى"];
+const TYPES = [
+  "بطاقة الرقم القومي",
+  "شهادة الميلاد المميكنة",
+  "جواز سفر",
+  "رخصة قيادة",
+  "صور شخصية",
+  "أخرى",
+];
 
 function statusOf(doc: StoredDoc) {
   if (!doc.expiresAt) return { label: "سارية", tone: "success" as const };
   const days = Math.ceil((new Date(doc.expiresAt).getTime() - Date.now()) / 86400000);
   if (days < 0) return { label: "انتهت — محتاجة تجديد", tone: "destructive" as const };
-  if (days < 180) return { label: `بتنتهي بعد ${Math.max(1, Math.round(days / 30))} شهر`, tone: "warning" as const };
+  if (days < 180)
+    return {
+      label: `بتنتهي بعد ${Math.max(1, Math.round(days / 30))} شهر`,
+      tone: "warning" as const,
+    };
   return { label: "سارية", tone: "success" as const };
 }
 
@@ -41,7 +61,10 @@ function Documents() {
     const files = Array.from(e.target.files ?? []);
     const ok: StoredDoc[] = [];
     for (const f of files) {
-      if (!(f.type === "application/pdf" || f.type.startsWith("image/")) || f.size > 5 * 1024 * 1024) {
+      if (
+        !(f.type === "application/pdf" || f.type.startsWith("image/")) ||
+        f.size > 5 * 1024 * 1024
+      ) {
         toast.error("الملف مرفعش. جرّب صورة أو PDF أصغر.");
         continue;
       }
@@ -103,7 +126,13 @@ function Documents() {
           <label className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90">
             <Upload className="size-4" aria-hidden="true" />
             أضف مستند
-            <input type="file" accept="application/pdf,image/*" multiple onChange={onFiles} className="sr-only" />
+            <input
+              type="file"
+              accept="application/pdf,image/*"
+              multiple
+              onChange={onFiles}
+              className="sr-only"
+            />
           </label>
         </div>
 
@@ -111,7 +140,9 @@ function Documents() {
           <div className="card-soft p-8 text-center">
             <FileText className="mx-auto size-10 text-muted-foreground" aria-hidden="true" />
             <p className="mt-3 font-bold">محفظتك فاضية</p>
-            <p className="mt-1 text-sm text-muted-foreground">أضف الأوراق اللي معاك عشان نعرف إيه الناقص.</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              أضف الأوراق اللي معاك عشان نعرف إيه الناقص.
+            </p>
             <Button asChild variant="outline" className="mt-4 min-h-12 rounded-2xl">
               <Link to="/services">اختار خدمة</Link>
             </Button>
@@ -145,10 +176,7 @@ function Documents() {
                       <Trash2 className="size-4" aria-hidden="true" />
                     </Button>
                   </div>
-                  <Badge
-                    className="mt-3"
-                    variant={st.tone === "success" ? "secondary" : "outline"}
-                  >
+                  <Badge className="mt-3" variant={st.tone === "success" ? "secondary" : "outline"}>
                     {st.tone !== "success" ? (
                       <AlertTriangle className="size-3.5" aria-hidden="true" />
                     ) : null}
