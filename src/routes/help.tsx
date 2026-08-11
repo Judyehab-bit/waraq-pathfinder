@@ -16,7 +16,10 @@ export const Route = createFileRoute("/help")({
   head: () => ({
     meta: [
       { title: "مساعدة — WARAQ" },
-      { name: "description", content: "أسئلة شائعة عن WARAQ، الخصوصية، والفرق بينه وبين المنصات الرسمية." },
+      {
+        name: "description",
+        content: "أسئلة شائعة عن WARAQ، الخصوصية، والفرق بينه وبين المنصات الرسمية.",
+      },
       { property: "og:title", content: "مساعدة WARAQ" },
       { property: "og:description", content: "إجابات سريعة وواضحة عن استخدام WARAQ." },
     ],
