@@ -5,13 +5,16 @@ import AppShell from "@/components/waraq/AppShell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { getService, requiredDocsFor } from "@/lib/waraq/services";
-import { useProcedures } from "@/lib/waraq/store";
+import { useProcedures, calculateProcedureProgress } from "@/lib/waraq/store";
 
 export const Route = createFileRoute("/procedures")({
   head: () => ({
     meta: [
       { title: "إجراءاتي — WARAQ" },
-      { name: "description", content: "كل الإجراءات اللي بدأتها ونسبة اكتمالها، وكمّل من حيث ما وقفت." },
+      {
+        name: "description",
+        content: "كل الإجراءات اللي بدأتها ونسبة اكتمالها، وكمّل من حيث ما وقفت.",
+      },
       { property: "og:title", content: "إجراءاتي في WARAQ" },
       { property: "og:description", content: "كمّل إجراءك من حيث ما وقفت." },
     ],
@@ -31,7 +34,9 @@ function Procedures() {
           <div className="card-soft p-8 text-center">
             <ClipboardList className="mx-auto size-10 text-muted-foreground" aria-hidden="true" />
             <p className="mt-3 font-bold">لسه ما بدأتش إجراء</p>
-            <p className="mt-1 text-sm text-muted-foreground">اختار خدمة وهنجهّزلك الخطوات على مقاسك.</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              اختار خدمة وهنجهّزلك الخطوات على مقاسك.
+            </p>
             <Button asChild className="mt-4 min-h-12 rounded-2xl">
               <Link to="/services">ابدأ إجراء</Link>
             </Button>
@@ -42,12 +47,19 @@ function Procedures() {
               const service = getService(p.serviceId);
               if (!service) return null;
               const docs = requiredDocsFor(service, p.answers);
-              const pct = docs.length ? Math.round((p.done.length / docs.length) * 100) : 0;
+              const { progress: pct, isComplete } = calculateProcedureProgress(
+                service.id,
+                p.answers,
+                p.done,
+              );
+
               return (
                 <li key={p.serviceId} className="card-soft p-4">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
                     <div className="min-w-0">
-                      <h2 className="truncate text-lg font-bold text-foreground">{service.serviceName}</h2>
+                      <h2 className="truncate text-lg font-bold text-foreground">
+                        {service.serviceName}
+                      </h2>
                       <p className="mt-1 text-xs text-muted-foreground">
                         آخر تحديث {new Date(p.updatedAt).toLocaleDateString("ar-EG")} ·{" "}
                         {p.done.length} من {docs.length} مستند
@@ -69,12 +81,12 @@ function Procedures() {
                   <div className="mt-3">
                     <Progress value={pct} className="h-2.5" />
                     <p className="mt-1 text-sm font-semibold text-accent">
-                      {pct === 100 ? "جاهز ✔ 100%" : `مكمّل ${pct}%`}
+                      {isComplete ? "جاهز ✔ 100%" : `مكمّل ${pct}%`}
                     </p>
                   </div>
                   <Button asChild className="mt-4 min-h-12 w-full rounded-2xl">
                     <Link to="/service/$serviceId" params={{ serviceId: service.id }}>
-                      {pct === 100 ? "افتح الإجراء" : "كمّل من حيث ما وقفت"}
+                      {isComplete ? "افتح الإجراء" : "كمّل من حيث ما وقفت"}
                     </Link>
                   </Button>
                 </li>
