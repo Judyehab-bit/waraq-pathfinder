@@ -34,7 +34,7 @@ function Welcome() {
     <div dir="rtl" className="min-h-dvh bg-background">
       <main className="mx-auto max-w-5xl px-5 py-8 sm:py-14">
         <div className="animate-rise flex flex-col items-center text-center">
-          <WaraqLogo className="h-16 sm:h-24" />
+          <WaraqLogo className="h-40 sm:h-56 lg:h-72" />
           <h1 className="mt-6 text-3xl font-extrabold leading-tight text-primary sm:text-5xl">
             ورقك من غير قلق
           </h1>
