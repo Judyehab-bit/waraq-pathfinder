@@ -30,8 +30,20 @@ export function WaraqLogo({ className = "h-9" }: { className?: string }) {
       src={logo.url}
       alt="WARAQ — ورق من غير قلق"
       className={`${className} w-auto object-contain`}
-      width={320}
-      height={80}
+      width={1536}
+      height={1728}
+    />
+  );
+}
+
+export function WaraqMark({ className = "h-9" }: { className?: string }) {
+  return (
+    <img
+      src={mark.url}
+      alt="WARAQ"
+      className={`${className} w-auto object-contain`}
+      width={1920}
+      height={1600}
     />
   );
 }
