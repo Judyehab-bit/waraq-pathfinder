@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { GOVERNORATES } from "@/lib/waraq/services";
 import { useDocs, useProfile, type StoredDoc } from "@/lib/waraq/store";
+import { saveProfileToCloud } from "@/lib/waraq/profile-sync";
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
