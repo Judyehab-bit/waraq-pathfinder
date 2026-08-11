@@ -43,7 +43,8 @@ export default function Chatbot() {
       return `${namedDoc.name}: ${namedDoc.why}\nتجيبها من: ${namedDoc.where}\nالتكلفة ${namedDoc.cost} — المدة ${namedDoc.time}\nافتح كارت الورقة في صفحة «${service.serviceName}» عشان تشوف كل التفاصيل والأماكن القريبة.`;
     }
     if (/ناقص|فاضل|كام ورقة|missing/.test(text)) {
-      if (missing.length === 0) return "مبروك، مفيش حاجة ناقصة! كل المستندات مكتملة وتقدر تكمل التقديم.";
+      if (missing.length === 0)
+        return "مبروك، مفيش حاجة ناقصة! كل المستندات مكتملة وتقدر تكمل التقديم.";
       return `فاضل ${missing.length} من ${docs.length}:\n${missing.map((d) => `• ${d.name}`).join("\n")}`;
     }
     if (/منين|فين|مكان|أطلع/.test(text)) {
@@ -53,7 +54,8 @@ export default function Chatbot() {
     }
     if (/الخطوة|الجاي|بعد كده|next/.test(text)) {
       const target = missing[0];
-      if (target) return `الخطوة الجاية: جهّز «${target.name}». ${target.howTo ? target.howTo[0] : target.where}`;
+      if (target)
+        return `الخطوة الجاية: جهّز «${target.name}». ${target.howTo ? target.howTo[0] : target.where}`;
       return "خلصت المستندات! الخطوة الجاية تقدّم الطلب من منصة مصر الرقمية أو من المكتب.";
     }
     if (/تكلفة|فلوس|كام جنيه|سعر/.test(text)) {
@@ -71,7 +73,12 @@ export default function Chatbot() {
     setInput("");
   }
 
-  const quick = ["إيه اللي ناقصني؟", "أطلع الورقة دي منين؟", "الخطوة الجاية إيه؟", "كام ورقة فاضلة؟"];
+  const quick = [
+    "إيه اللي ناقصني؟",
+    "أطلع الورقة دي منين؟",
+    "الخطوة الجاية إيه؟",
+    "كام ورقة فاضلة؟",
+  ];
 
   return (
     <>
@@ -108,7 +115,10 @@ export default function Chatbot() {
 
           <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
             {msgs.map((m, i) => (
-              <div key={i} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
+              <div
+                key={i}
+                className={m.role === "user" ? "flex justify-end" : "flex justify-start"}
+              >
                 <p
                   className={
                     m.role === "user"
@@ -149,7 +159,12 @@ export default function Chatbot() {
               aria-label="اكتب سؤالك"
               className="rounded-xl"
             />
-            <Button type="submit" size="icon" aria-label="إرسال" className="min-h-11 min-w-11 shrink-0">
+            <Button
+              type="submit"
+              size="icon"
+              aria-label="إرسال"
+              className="min-h-11 min-w-11 shrink-0"
+            >
               <Send className="size-4" aria-hidden="true" />
             </Button>
           </form>
