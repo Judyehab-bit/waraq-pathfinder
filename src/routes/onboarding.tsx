@@ -280,8 +280,20 @@ function Onboarding() {
           type="button"
           variant="ghost"
           className="min-h-12 w-full rounded-2xl"
-          onClick={() => {
-            setProfile({ name: name.trim() || "صديقنا", age: age || "—", city: city || "القاهرة", geo: null });
+          onClick={async () => {
+            const data = {
+              name: name.trim() || "صديقنا",
+              age: age || "—",
+              city: city || "القاهرة",
+              area: area.trim(),
+              geo: null,
+            };
+            setProfile(data);
+            try {
+              await saveProfileToCloud(data);
+            } catch {
+              toast.error("مقدرناش نحفظ بياناتك دلوقتي، بس بياناتك محفوظة على جهازك.");
+            }
             navigate({ to: "/services" });
           }}
         >
