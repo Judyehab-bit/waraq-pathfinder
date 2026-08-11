@@ -149,7 +149,7 @@ export default function AppShell({
       <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
         <div className="mx-auto grid max-w-5xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3">
           <Link to="/services" className="min-w-0" aria-label="WARAQ">
-            <WaraqLogo className="h-8 sm:h-10" />
+            <WaraqMark className="h-11 sm:h-14" />
           </Link>
           <div className="flex shrink-0 items-center gap-1">
             <nav aria-label="التنقل" className="hidden md:flex md:items-center md:gap-1">
