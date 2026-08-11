@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Home, ClipboardList, FileText, HelpCircle, Settings2 } from "lucide-react";
 import logo from "@/assets/waraq-logo.png.asset.json";
+import mark from "@/assets/waraq-mark.png.asset.json";
 import { useSettings } from "@/lib/waraq/store";
 import { useT } from "@/lib/waraq/i18n";
 import { Button } from "@/components/ui/button";
