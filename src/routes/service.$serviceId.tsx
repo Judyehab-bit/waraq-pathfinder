@@ -25,7 +25,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { getService, requiredDocsFor, stepsFor, visibleQuestions } from "@/lib/waraq/services";
-import { useDocs, useProcedures } from "@/lib/waraq/store";
+import { useDocs, useProcedures, calculateProcedureProgress } from "@/lib/waraq/store";
 import type { DocumentDetail } from "@/lib/waraq/types";
 
 export const Route = createFileRoute("/service/$serviceId")({
@@ -34,7 +34,8 @@ export const Route = createFileRoute("/service/$serviceId")({
       { title: "خطواتك خطوة بخطوة — WARAQ" },
       {
         name: "description",
-        content: "أسئلة سريعة، وبعدها قائمة مستندات وخطوات مخصّصة لحالتك مع التكلفة والوقت التقديري.",
+        content:
+          "أسئلة سريعة، وبعدها قائمة مستندات وخطوات مخصّصة لحالتك مع التكلفة والوقت التقديري.",
       },
       { property: "og:title", content: "خطة إجراءك في WARAQ" },
       { property: "og:description", content: "اعرف المطلوب، الناقص، والخطوة الجاية." },
@@ -85,12 +86,16 @@ function ServicePage() {
   );
   const steps = stepsFor(service, proc?.answers ?? answers);
   const done = proc?.done ?? [];
-  const pct = requiredDocs.length ? Math.round((done.length / requiredDocs.length) * 100) : 0;
-  const complete = requiredDocs.length > 0 && done.length === requiredDocs.length;
 
-  function saveAnswers() {
+  const { progress: pct, isComplete: complete } = calculateProcedureProgress(
+    service.id,
+    proc?.answers ?? answers,
+    done,
+  );
+
+  async function saveAnswers() {
     if (!service) return;
-    upsert(service.id, { answers, answered: true, done: suggestedIds(), });
+    await upsert(service.id, { answers, answered: true, done: suggestedIds() });
     toast.success("تمام! جهزنا لك الخطوات المناسبة لحالتك.");
   }
 
@@ -102,10 +107,10 @@ function ServicePage() {
     return Array.from(new Set([...(proc?.done ?? []), ...fromWallet]));
   }
 
-  function toggle(docId: string) {
+  async function toggle(docId: string) {
     if (!service) return;
     const next = done.includes(docId) ? done.filter((d) => d !== docId) : [...done, docId];
-    upsert(service.id, { done: next, answers: proc?.answers ?? answers, answered: true });
+    await upsert(service.id, { done: next, answers: proc?.answers ?? answers, answered: true });
     if (!done.includes(docId)) toast.success("تمام ✔ اتحدثت الخطوات");
   }
 
@@ -191,7 +196,9 @@ function ServicePage() {
         <div className="card-soft p-5">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
             <div className="min-w-0">
-              <h1 className="text-xl font-extrabold text-foreground sm:text-2xl">{service.serviceName}</h1>
+              <h1 className="text-xl font-extrabold text-foreground sm:text-2xl">
+                {service.serviceName}
+              </h1>
               <p className="mt-1 text-sm text-muted-foreground">
                 {done.length} / {requiredDocs.length} مكتمل · {steps.length} خطوات
               </p>
@@ -200,8 +207,8 @@ function ServicePage() {
               variant="outline"
               size="sm"
               className="shrink-0"
-              onClick={() => {
-                upsert(service.id, { answered: false });
+              onClick={async () => {
+                await upsert(service.id, { answered: false });
                 toast.info("تقدر تعدّل إجاباتك دلوقتي");
               }}
             >
@@ -210,7 +217,9 @@ function ServicePage() {
             </Button>
           </div>
           <Progress value={pct} className="mt-4 h-3 transition-all" />
-          <p className="mt-2 text-sm font-bold text-accent">{pct}% جاهز</p>
+          <p className="mt-2 text-sm font-bold text-accent">
+            {complete ? "جاهز 100% ✔" : `${pct}% جاهز`}
+          </p>
           {suggested.length > 0 && (
             <p className="mt-2 text-xs text-muted-foreground">
               علّمنا تلقائيًا الأوراق اللي موجودة في محفظتك. راجعها وعدّل لو لازم.
@@ -240,7 +249,11 @@ function ServicePage() {
                           : "border-input bg-card text-muted-foreground"
                       }`}
                     >
-                      {have ? <Check className="size-5" aria-hidden="true" /> : <span aria-hidden="true">☐</span>}
+                      {have ? (
+                        <Check className="size-5" aria-hidden="true" />
+                      ) : (
+                        <span aria-hidden="true">☐</span>
+                      )}
                     </button>
                     <button
                       type="button"
@@ -263,7 +276,7 @@ function ServicePage() {
                       variant={have ? "secondary" : "outline"}
                       className={`shrink-0 ${have ? "text-success" : "text-muted-foreground"}`}
                     >
-                      {have ? "✅ معاك" : "❌ ناقصة"}
+                      {have ? "✅ معايا" : "❌ ناقصة"}
                     </Badge>
                   </div>
                 </li>
@@ -353,8 +366,8 @@ function ServicePage() {
         </Button>
 
         <p className="text-xs text-muted-foreground">
-          آخر تحديث لبيانات الخدمة: {service.lastUpdated} · البيانات نموذجية للتوضيح وليست بيانات رسمية
-          موثّقة.
+          آخر تحديث لبيانات الخدمة: {service.lastUpdated} · البيانات نموذجية للتوضيح وليست بيانات
+          رسمية موثّقة.
         </p>
       </div>
 
