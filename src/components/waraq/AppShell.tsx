@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Home, ClipboardList, FileText, HelpCircle, Settings2 } from "lucide-react";
-import logo from "@/assets/waraq-logo.png.asset.json";
+import logo from "@/assets/waraq-full-logo.png.asset.json";
 import mark from "@/assets/waraq-mark.png.asset.json";
 import { useSettings } from "@/lib/waraq/store";
 import { useT } from "@/lib/waraq/i18n";
@@ -31,8 +31,8 @@ export function WaraqLogo({ className = "h-9" }: { className?: string }) {
       src={logo.url}
       alt="WARAQ — ورق من غير قلق"
       className={`${className} w-auto object-contain`}
-      width={1536}
-      height={1728}
+      width={770}
+      height={873}
     />
   );
 }
