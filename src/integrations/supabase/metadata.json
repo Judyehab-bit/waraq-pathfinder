@@ -1,0 +1,6 @@
+{
+  "name": "Waraq Pathfinder",
+  "description": "Government and civil service procedure pathfinder helping citizens navigate document requirements, procedures, and official paperwork.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
