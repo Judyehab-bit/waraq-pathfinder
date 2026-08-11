@@ -5,7 +5,7 @@ import AppShell from "@/components/waraq/AppShell";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { SERVICES } from "@/lib/waraq/services";
-import { useProcedures, useProfile } from "@/lib/waraq/store";
+import { useProcedures, useProfile, calculateProcedureProgress } from "@/lib/waraq/store";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,8 @@ function Services() {
     const term = q.trim();
     if (!term) return SERVICES;
     return SERVICES.filter(
-      (s) => s.serviceName.includes(term) || s.description.includes(term) || s.shortName.includes(term),
+      (s) =>
+        s.serviceName.includes(term) || s.description.includes(term) || s.shortName.includes(term),
     );
   }, [q]);
 
@@ -43,7 +44,7 @@ function Services() {
       <div className="animate-rise space-y-6">
         <div>
           <h1 className="text-2xl font-extrabold text-foreground">
-            أهلاً يا {profile?.name || "صديقنا"} 👋
+            أهلاً يا {profile?.name || profile?.username || "صديقنا"} 👋
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {profile?.city ? `محافظة ${profile.city}` : "اختار خدمتك ونجهّزلك الخطوات"}
@@ -69,8 +70,9 @@ function Services() {
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {list.map((s) => {
             const proc = procedures.find((p) => p.serviceId === s.id);
-            const total = proc ? s.requiredDocuments.length : 0;
-            const pct = proc && total ? Math.round((proc.done.length / total) * 100) : 0;
+            const { progress: pct, isComplete } = proc
+              ? calculateProcedureProgress(s.id, proc.answers, proc.done)
+              : { progress: 0, isComplete: false };
 
             const card = (
               <>
@@ -94,7 +96,9 @@ function Services() {
                 {proc && !s.comingSoon ? (
                   <div className="mt-3">
                     <Progress value={pct} className="h-2" />
-                    <p className="mt-1 text-xs font-semibold text-accent">مكمّل {pct}%</p>
+                    <p className="mt-1 text-xs font-semibold text-accent">
+                      {isComplete ? "مكتمل ✔ 100%" : `مكمّل ${pct}%`}
+                    </p>
                   </div>
                 ) : null}
               </>
@@ -105,7 +109,9 @@ function Services() {
                 {s.comingSoon ? (
                   <button
                     type="button"
-                    onClick={() => toast.info("الخدمة دي قريبًا في WARAQ. جرّب الخدمات المتاحة دلوقتي.")}
+                    onClick={() =>
+                      toast.info("الخدمة دي قريبًا في WARAQ. جرّب الخدمات المتاحة دلوقتي.")
+                    }
                     className="card-soft h-full w-full p-4 text-start opacity-80 transition-transform hover:scale-[1.01]"
                   >
                     {card}
@@ -126,7 +132,9 @@ function Services() {
           <li>
             <button
               type="button"
-              onClick={() => toast.info("بنضيف خدمات جديدة باستمرار. قولنا محتاج إيه من صفحة المساعدة.")}
+              onClick={() =>
+                toast.info("بنضيف خدمات جديدة باستمرار. قولنا محتاج إيه من صفحة المساعدة.")
+              }
               className="card-soft flex h-full min-h-40 w-full flex-col items-center justify-center gap-2 border-dashed p-4 text-muted-foreground transition-colors hover:bg-secondary/50"
             >
               <Plus className="size-7" aria-hidden="true" />
@@ -138,8 +146,8 @@ function Services() {
 
         <p className="flex items-start gap-2 rounded-2xl bg-muted p-3 text-xs leading-relaxed text-muted-foreground">
           <Lock className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-          بيانات الخدمات والأماكن في النسخة التجريبية بيانات نموذجية للتوضيح، وليست بيانات رسمية موثّقة.
-          الإجراء الرسمي نفسه بيتم من خلال الجهة الحكومية.
+          بيانات الخدمات والأماكن في النسخة التجريبية بيانات نموذجية للتوضيح، وليست بيانات رسمية
+          موثّقة. الإجراء الرسمي نفسه بيتم من خلال الجهة الحكومية.
         </p>
 
         {procedures.length > 0 && (
