@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { GOVERNORATES } from "@/lib/waraq/services";
 import { useDocs, useProfile, type StoredDoc } from "@/lib/waraq/store";
+import { saveProfileToCloud } from "@/lib/waraq/profile-sync";
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
@@ -92,7 +93,7 @@ function Onboarding() {
     e.target.value = "";
   }
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     const next: Record<string, string> = {};
     if (!name.trim()) next["name"] = "اكتب اسمك عشان نكلمك باسمك.";
@@ -101,7 +102,14 @@ function Onboarding() {
     setErrors(next);
     if (Object.keys(next).length) return;
 
-    setProfile({ name: name.trim(), age, city, area: area.trim(), geo });
+    const data = { name: name.trim(), age, city, area: area.trim(), geo };
+    setProfile(data);
+    try {
+      await saveProfileToCloud(data);
+    } catch {
+      toast.error("مقدرناش نحفظ بياناتك دلوقتي. بياناتك محفوظة على جهازك، جرّب تاني بعد شوية.");
+      return;
+    }
     toast.success("أهلاً بيك في WARAQ 👋");
     navigate({ to: "/services" });
   }
@@ -272,8 +280,20 @@ function Onboarding() {
           type="button"
           variant="ghost"
           className="min-h-12 w-full rounded-2xl"
-          onClick={() => {
-            setProfile({ name: name.trim() || "صديقنا", age: age || "—", city: city || "القاهرة", geo: null });
+          onClick={async () => {
+            const data = {
+              name: name.trim() || "صديقنا",
+              age: age || "—",
+              city: city || "القاهرة",
+              area: area.trim(),
+              geo: null,
+            };
+            setProfile(data);
+            try {
+              await saveProfileToCloud(data);
+            } catch {
+              toast.error("مقدرناش نحفظ بياناتك دلوقتي، بس بياناتك محفوظة على جهازك.");
+            }
             navigate({ to: "/services" });
           }}
         >

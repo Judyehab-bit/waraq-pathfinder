@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Home, ClipboardList, FileText, HelpCircle, Settings2 } from "lucide-react";
 import logo from "@/assets/waraq-logo.png.asset.json";
+import mark from "@/assets/waraq-mark.png.asset.json";
 import { useSettings } from "@/lib/waraq/store";
 import { useT } from "@/lib/waraq/i18n";
 import { Button } from "@/components/ui/button";
@@ -30,8 +31,20 @@ export function WaraqLogo({ className = "h-9" }: { className?: string }) {
       src={logo.url}
       alt="WARAQ — ورق من غير قلق"
       className={`${className} w-auto object-contain`}
-      width={320}
-      height={80}
+      width={1536}
+      height={1728}
+    />
+  );
+}
+
+export function WaraqMark({ className = "h-9" }: { className?: string }) {
+  return (
+    <img
+      src={mark.url}
+      alt="WARAQ"
+      className={`${className} w-auto object-contain`}
+      width={1920}
+      height={1600}
     />
   );
 }
@@ -136,7 +149,7 @@ export default function AppShell({
       <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
         <div className="mx-auto grid max-w-5xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3">
           <Link to="/services" className="min-w-0" aria-label="WARAQ">
-            <WaraqLogo className="h-8 sm:h-10" />
+            <WaraqMark className="h-11 sm:h-14" />
           </Link>
           <div className="flex shrink-0 items-center gap-1">
             <nav aria-label="التنقل" className="hidden md:flex md:items-center md:gap-1">
