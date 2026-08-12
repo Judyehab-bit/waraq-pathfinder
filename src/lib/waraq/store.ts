@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { getService, requiredDocsFor } from "./services";
 import {
@@ -269,6 +270,7 @@ export function useProcedures() {
     const done = patch.done ?? existing?.done ?? [];
     const { progress, status, isComplete } = calculateProcedureProgress(serviceId, answers, done);
 
+    const completedAt = isComplete ? now : existing?.completedAt;
     const next: Procedure = {
       serviceId,
       serviceName: service?.serviceName || serviceId,
@@ -279,8 +281,9 @@ export function useProcedures() {
       progress,
       startedAt: existing?.startedAt ?? now,
       updatedAt: now,
-      completedAt: isComplete ? now : existing?.completedAt,
+      ...(completedAt ? { completedAt } : {}),
     };
+
 
     const updatedList = [next, ...globalProcedures.filter((p) => p.serviceId !== serviceId)];
     globalProcedures = updatedList;
@@ -291,6 +294,7 @@ export function useProcedures() {
       await saveProcedureToCloud(next);
     } catch (e) {
       console.error("Failed to save procedure:", e);
+      toast.error("لم نتمكن من حفظ تقدمك. راجع اتصالك وجرّب تاني.");
     }
 
     return next;
@@ -363,6 +367,7 @@ export function useDocs() {
         await saveDocumentToCloud(d);
       } catch (e) {
         console.error("Failed to save doc:", e);
+        toast.error("لم نتمكن من حفظ المستند. جرّب تاني.");
       }
     }
   }, []);
