@@ -14,42 +14,126 @@ export type Database = {
   }
   public: {
     Tables: {
+      documents: {
+        Row: {
+          created_at: string
+          document_type: string
+          expiration_date: string | null
+          file_name: string | null
+          file_type: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_type: string
+          expiration_date?: string | null
+          file_name?: string | null
+          file_type?: string | null
+          id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          document_type?: string
+          expiration_date?: string | null
+          file_name?: string | null
+          file_type?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      procedures: {
+        Row: {
+          answers: Json
+          completed_at: string | null
+          created_at: string
+          done: Json
+          id: string
+          progress: number
+          service_id: string
+          service_name: string | null
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          completed_at?: string | null
+          created_at?: string
+          done?: Json
+          id?: string
+          progress?: number
+          service_id: string
+          service_name?: string | null
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          completed_at?: string | null
+          created_at?: string
+          done?: Json
+          id?: string
+          progress?: number
+          service_id?: string
+          service_name?: string | null
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: string
           area: string | null
           city: string
           created_at: string
+          email: string | null
           full_name: string
           geo_lat: number | null
           geo_lng: number | null
           id: string
           updated_at: string
           user_id: string | null
+          username: string | null
         }
         Insert: {
           age: string
           area?: string | null
           city: string
           created_at?: string
+          email?: string | null
           full_name: string
           geo_lat?: number | null
           geo_lng?: number | null
           id?: string
           updated_at?: string
           user_id?: string | null
+          username?: string | null
         }
         Update: {
           age?: string
           area?: string | null
           city?: string
           created_at?: string
+          email?: string | null
           full_name?: string
           geo_lat?: number | null
           geo_lng?: number | null
           id?: string
           updated_at?: string
           user_id?: string | null
+          username?: string | null
         }
         Relationships: []
       }
@@ -58,7 +142,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      email_for_username: { Args: { _username: string }; Returns: string }
+      username_available: { Args: { _username: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
