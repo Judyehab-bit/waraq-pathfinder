@@ -44,7 +44,7 @@ function Services() {
       <div className="animate-rise space-y-6">
         <div>
           <h1 className="text-2xl font-extrabold text-foreground">
-            أهلاً يا {profile?.name || profile?.username || "صديقنا"} 👋
+            أهلاً يا {profile?.username || profile?.name || "صديقنا"} 👋
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {profile?.city ? `محافظة ${profile.city}` : "اختار خدمتك ونجهّزلك الخطوات"}

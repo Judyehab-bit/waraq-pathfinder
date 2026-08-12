@@ -150,10 +150,10 @@ function Onboarding() {
     e.preventDefault();
     const nextErrs: Record<string, string> = {};
 
-    const identifier = loginIdentifier.trim() || username.trim();
+    const identifier = loginIdentifier.trim().toLowerCase();
 
-    if (!identifier) {
-      nextErrs["loginIdentifier"] = "اكتب البريد الإلكتروني أو اسم المستخدم.";
+    if (!identifier || !identifier.includes("@")) {
+      nextErrs["loginIdentifier"] = "اكتب البريد الإلكتروني المسجل به حسابك.";
     }
     if (!password) {
       nextErrs["password"] = "اكتب كلمة المرور.";
@@ -189,7 +189,7 @@ function Onboarding() {
           <p className="mt-1 text-sm text-muted-foreground">
             {mode === "signup"
               ? "بيانات حسابك لحفظ خطوات أوراقك ومتابعة تقدمك من أي جهاز."
-              : "ادخل البريد الإلكتروني أو اسم المستخدم وكلمة المرور لمتابعة إجراءاتك."}
+              : "ادخل البريد الإلكتروني وكلمة المرور لمتابعة إجراءاتك."}
           </p>
         </div>
 
@@ -231,12 +231,12 @@ function Onboarding() {
           /* LOGIN FORM */
           <form onSubmit={handleLogin} className="card-soft space-y-5 p-5">
             <div>
-              <Label htmlFor="login-identifier">البريد الإلكتروني أو اسم المستخدم</Label>
+              <Label htmlFor="login-identifier">البريد الإلكتروني</Label>
               <Input
                 id="login-identifier"
                 value={loginIdentifier}
                 onChange={(e) => setLoginIdentifier(e.target.value)}
-                placeholder="مثال: user@example.com أو ahmed_2026"
+                placeholder="مثال: user@example.com"
                 className="mt-2 min-h-12 rounded-xl"
                 aria-invalid={Boolean(errors["loginIdentifier"])}
               />
