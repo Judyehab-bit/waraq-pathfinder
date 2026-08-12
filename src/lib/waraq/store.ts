@@ -269,6 +269,7 @@ export function useProcedures() {
     const done = patch.done ?? existing?.done ?? [];
     const { progress, status, isComplete } = calculateProcedureProgress(serviceId, answers, done);
 
+    const completedAt = isComplete ? now : existing?.completedAt;
     const next: Procedure = {
       serviceId,
       serviceName: service?.serviceName || serviceId,
@@ -279,8 +280,9 @@ export function useProcedures() {
       progress,
       startedAt: existing?.startedAt ?? now,
       updatedAt: now,
-      completedAt: isComplete ? now : existing?.completedAt,
+      ...(completedAt ? { completedAt } : {}),
     };
+
 
     const updatedList = [next, ...globalProcedures.filter((p) => p.serviceId !== serviceId)];
     globalProcedures = updatedList;
