@@ -60,7 +60,7 @@ export default function DocumentDialog({
   const [speaking, setSpeaking] = useState(false);
 
   if (!doc) return null;
-  const places = placesFor(profile?.city ?? "");
+  const places = placesFor(profile?.city ?? "", profile?.area);
   const relevant = places.filter((p) => {
     if (doc.id === "photos") return p.type === "استوديو تصوير" || p.type === "طباعة وخدمات";
     if (doc.id === "medical" || doc.id === "drivingTest") return p.name.includes("المرور");
@@ -196,7 +196,7 @@ export default function DocumentDialog({
             <div>
               <h3 className="font-bold">أماكن قريبة منك</h3>
               <p className="mt-1 text-xs text-muted-foreground">
-                بيانات نموذجية للعرض (مش بيانات رسمية موثقة) — جاهزة للربط بخدمة خرائط حقيقية.
+                نتائج بحث في محافظة {profile?.city} — اضغط «الخريطة» لعرض الأماكن الفعلية.
               </p>
               <ul className="mt-3 space-y-3">
                 {relevant.map((p) => (
@@ -207,7 +207,7 @@ export default function DocumentDialog({
                         <p className="text-xs text-muted-foreground">{p.address}</p>
                         <p className="mt-1 text-xs text-muted-foreground">
                           {p.hours}
-                          {profile?.geo && p.distanceKm ? ` · ${p.distanceKm} كم` : ""}
+                          {p.distanceKm ? ` · ${p.distanceKm} كم` : ""}
                           {p.travelMinutes ? ` · حوالي ${p.travelMinutes} دقيقة` : ""}
                         </p>
                         {p.accessibility ? (
