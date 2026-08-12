@@ -268,15 +268,23 @@ const PLACE_TEMPLATES: Omit<Place, "id" | "address" | "mapQuery">[] = [
   },
 ];
 
-export function placesFor(city: string): Place[] {
-  const c = city || "مدينتك";
+/**
+ * Builds the location list for the user's SELECTED Egyptian governorate.
+ * The governorate name is always used verbatim in the map search query,
+ * never a generic placeholder. Returns [] when no governorate is selected.
+ */
+export function placesFor(governorate: string, area?: string): Place[] {
+  const gov = governorate.trim();
+  if (!gov) return [];
+  const areaPart = area?.trim() ? `${area.trim()} – ` : "";
   return PLACE_TEMPLATES.map((p, i) => ({
     ...p,
     id: `place-${i}`,
-    address: `${c} – عنوان تجريبي ${i + 1}`,
-    mapQuery: `${p.name} ${c}`,
+    address: `${areaPart}محافظة ${gov}`,
+    mapQuery: `${p.name} ${gov}`,
   }));
 }
+
 
 const yesNo = [
   { value: "yes", label: "أيوه" },
