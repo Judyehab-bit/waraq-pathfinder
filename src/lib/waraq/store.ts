@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { getService, requiredDocsFor } from "./services";
 import {
@@ -293,6 +294,7 @@ export function useProcedures() {
       await saveProcedureToCloud(next);
     } catch (e) {
       console.error("Failed to save procedure:", e);
+      toast.error("لم نتمكن من حفظ تقدمك. راجع اتصالك وجرّب تاني.");
     }
 
     return next;
@@ -365,6 +367,7 @@ export function useDocs() {
         await saveDocumentToCloud(d);
       } catch (e) {
         console.error("Failed to save doc:", e);
+        toast.error("لم نتمكن من حفظ المستند. جرّب تاني.");
       }
     }
   }, []);
