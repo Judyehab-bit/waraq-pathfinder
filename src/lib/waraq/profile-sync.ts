@@ -84,19 +84,40 @@ export async function signUpWithEmail(params: {
 }
 
 export async function signInWithEmail(email: string, password: string) {
-  const cleanEmail = email.trim().toLowerCase();
+  const normalizedEmail = email.trim().toLowerCase();
 
   const { data, error } = await supabase.auth.signInWithPassword({
-    email: cleanEmail,
+    email: normalizedEmail,
     password,
   });
 
   if (error) {
-    console.error("[auth] sign-in failed:", error.message);
+    console.error("Supabase login error:", error);
+    console.error("[auth] sign-in failed", {
+      code: error.code,
+      name: error.name,
+      message: error.message,
+      status: error.status,
+    });
     throw new Error(friendlyAuthError(error.message));
   }
 
-  return data.user;
+  if (!data.session || !data.user) {
+    console.error("[auth] sign-in returned no authenticated session", {
+      hasSession: Boolean(data.session),
+      hasUser: Boolean(data.user),
+    });
+    throw new Error("تم قبول بيانات الدخول لكن تعذر بدء الجلسة. حاول مرة أخرى.");
+  }
+
+  const { data: verified, error: verificationError } = await supabase.auth.getUser();
+  if (verificationError || !verified.user || verified.user.id !== data.user.id) {
+    console.error("[auth] session verification failed", verificationError);
+    await supabase.auth.signOut({ scope: "local" });
+    throw new Error("تعذر التحقق من جلسة الدخول. حاول مرة أخرى.");
+  }
+
+  return verified.user;
 }
 
 // Keep backward compatibility aliases
