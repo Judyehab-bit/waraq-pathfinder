@@ -164,7 +164,10 @@ function Onboarding() {
 
     setSubmitting(true);
     try {
-      await signInWithUsername(identifier, password);
+      const authenticatedUser = await signInWithUsername(identifier, password);
+      if (!authenticatedUser) {
+        throw new Error("تعذر التحقق من جلسة الدخول. حاول مرة أخرى.");
+      }
       await refreshProfile();
       toast.success("تم تسجيل الدخول بنجاح! مرحباً بعودتك 👋");
       navigate({ to: "/services" });

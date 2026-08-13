@@ -1,4 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
 import {
   Home,
@@ -9,6 +11,7 @@ import {
   LogOut,
   User,
   MapPin,
+  Trash2,
 } from "lucide-react";
 import logo from "@/assets/waraq-full-logo.png.asset.json";
 import mark from "@/assets/waraq-mark.png.asset.json";
@@ -34,9 +37,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { GOVERNORATES } from "@/lib/waraq/services";
-import { signOutCurrentSession } from "@/lib/waraq/profile-sync";
+import { clearLocalSession, signOutCurrentSession } from "@/lib/waraq/profile-sync";
 import { toast } from "sonner";
 import Chatbot from "./Chatbot";
+import { deleteCurrentAccount } from "@/lib/waraq/account.functions";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const NAV = [
   { to: "/services", key: "home", Icon: Home },
@@ -71,6 +86,8 @@ export function WaraqMark({ className = "h-9" }: { className?: string }) {
 
 function SettingsAndProfileMenu() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const deleteAccount = useServerFn(deleteCurrentAccount);
   const { user } = useAuthUser();
   const { profile, setProfile } = useProfile();
   const { settings, setSettings } = useSettings();
@@ -80,6 +97,7 @@ function SettingsAndProfileMenu() {
   const [city, setCity] = useState(profile?.city || "القاهرة");
   const [area, setArea] = useState(profile?.area || "");
   const [open, setOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -102,10 +120,35 @@ function SettingsAndProfileMenu() {
   }
 
   async function handleLogout() {
-    await signOutCurrentSession();
-    toast.success("تم تسجيل الخروج");
-    setOpen(false);
-    navigate({ to: "/onboarding" });
+    try {
+      await queryClient.cancelQueries();
+      queryClient.clear();
+      await signOutCurrentSession();
+      toast.success("تم تسجيل الخروج");
+      setOpen(false);
+      navigate({ to: "/onboarding", replace: true });
+    } catch (error) {
+      console.error("[auth] sign-out failed", error);
+      toast.error("تعذر تسجيل الخروج. حاول مرة أخرى.");
+    }
+  }
+
+  async function handleDeleteAccount() {
+    setDeleting(true);
+    try {
+      await deleteAccount();
+      await queryClient.cancelQueries();
+      queryClient.clear();
+      await clearLocalSession();
+      setOpen(false);
+      toast.success("تم حذف حسابك وبياناتك نهائيًا");
+      navigate({ to: "/onboarding", replace: true });
+    } catch (error) {
+      console.error("[auth] account deletion failed", error);
+      toast.error(error instanceof Error ? error.message : "تعذر حذف الحساب. حاول مرة أخرى.");
+    } finally {
+      setDeleting(false);
+    }
   }
 
   const sizes: { value: "normal" | "large" | "xl"; label: string }[] = [
@@ -237,7 +280,7 @@ function SettingsAndProfileMenu() {
           </div>
 
           {user && (
-            <div className="pt-2">
+            <div className="space-y-3 pt-2">
               <Button
                 variant="destructive"
                 onClick={handleLogout}
@@ -246,6 +289,39 @@ function SettingsAndProfileMenu() {
                 <LogOut className="ml-2 size-4" />
                 تسجيل الخروج
               </Button>
+
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="min-h-12 w-full rounded-xl border-destructive/50 font-bold text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    <Trash2 className="ml-2 size-4" />
+                    حذف الحساب نهائيًا
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent dir="rtl">
+                  <AlertDialogHeader className="text-right sm:text-right">
+                    <AlertDialogTitle>حذف الحساب نهائيًا؟</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      سيتم حذف ملفك الشخصي وإجراءاتك ومستنداتك نهائيًا، ولا يمكن التراجع عن ذلك.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className="gap-2 sm:space-x-0">
+                    <AlertDialogCancel disabled={deleting}>إلغاء</AlertDialogCancel>
+                    <AlertDialogAction
+                      disabled={deleting}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        void handleDeleteAccount();
+                      }}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {deleting ? "جاري الحذف..." : "نعم، احذف حسابي"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           )}
         </div>
