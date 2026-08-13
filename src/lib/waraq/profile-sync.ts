@@ -128,6 +128,10 @@ export async function signOutCurrentSession() {
   await supabase.auth.signOut();
 }
 
+export async function clearLocalSession() {
+  await supabase.auth.signOut({ scope: "local" });
+}
+
 export async function fetchProfileFromCloud(): Promise<Profile | null> {
   const {
     data: { user },

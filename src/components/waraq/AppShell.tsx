@@ -37,7 +37,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { GOVERNORATES } from "@/lib/waraq/services";
-import { signOutCurrentSession } from "@/lib/waraq/profile-sync";
+import { clearLocalSession, signOutCurrentSession } from "@/lib/waraq/profile-sync";
 import { toast } from "sonner";
 import Chatbot from "./Chatbot";
 import { deleteCurrentAccount } from "@/lib/waraq/account.functions";
@@ -123,7 +123,7 @@ function SettingsAndProfileMenu() {
     try {
       await queryClient.cancelQueries();
       queryClient.clear();
-      await signOutCurrentSession();
+      await clearLocalSession();
       toast.success("تم تسجيل الخروج");
       setOpen(false);
       navigate({ to: "/onboarding", replace: true });
