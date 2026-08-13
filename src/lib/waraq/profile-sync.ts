@@ -49,6 +49,13 @@ export async function signUpWithEmail(params: {
   const user = data.user;
   if (!user) throw new Error("لم نتمكن من إنشاء الحساب. حاول مرة أخرى.");
 
+  // Auth intentionally obscures duplicate-email signups by returning a user
+  // without identities. Treat that as an existing account instead of trying
+  // to sign in with the password from the registration form.
+  if (Array.isArray(user.identities) && user.identities.length === 0) {
+    throw new Error("البريد الإلكتروني هذا مسجل بالفعل. يمكنك تسجيل الدخول.");
+  }
+
   // Ensure a session exists so the profile insert passes RLS.
   if (!data.session) {
     const { error: signInErr } = await supabase.auth.signInWithPassword({
