@@ -123,7 +123,7 @@ function SettingsAndProfileMenu() {
     try {
       await queryClient.cancelQueries();
       queryClient.clear();
-      await clearLocalSession();
+      await signOutCurrentSession();
       toast.success("تم تسجيل الخروج");
       setOpen(false);
       navigate({ to: "/onboarding", replace: true });
@@ -139,7 +139,7 @@ function SettingsAndProfileMenu() {
       await deleteAccount();
       await queryClient.cancelQueries();
       queryClient.clear();
-      await signOutCurrentSession();
+      await clearLocalSession();
       setOpen(false);
       toast.success("تم حذف حسابك وبياناتك نهائيًا");
       navigate({ to: "/onboarding", replace: true });
